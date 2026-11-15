@@ -201,4 +201,51 @@ describe('admin panel', () => {
       active: false,
     })
   })
+
+  it('fonlar: AI bilan yaratish va uslub qilish', async () => {
+    const calls = server({
+      ...me,
+      'GET /admin/backgrounds': () => [
+        {
+          id: 'b1',
+          name: 'Oshxona',
+          source: 'ai',
+          createdAt: '2026-11-15T00:00:00Z',
+          url: 'https://api.x/api/v1/bg/b1',
+        },
+      ],
+      'GET /admin/styles': () => [
+        { id: 'olov', name: 'Olov', tier: 'free', active: true, sort: 1 },
+        { id: 'f-loft', name: 'Foto · Loft', tier: 'premium', active: true, sort: 20 },
+      ],
+      'POST /admin/backgrounds/generate': (b) => ({ id: 'b2', ...(b as object) }),
+      'POST /admin/backgrounds/b1/style': () => ({ styleId: 'a-b1' }),
+      'POST /admin/styles/f-loft/active': () => ({ active: false }),
+    })
+    open('/fonlar')
+    await userEvent.click(await screen.findByRole('button', { name: 'Kafe' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Yaratish' }))
+    expect(calls.find((c) => c.key === 'POST /admin/backgrounds/generate')?.body).toMatchObject({
+      name: 'Kafe',
+      prompt: expect.stringContaining('cafe'),
+    })
+    expect(await screen.findByRole('status')).toHaveTextContent('Fon yaratildi')
+
+    const card = screen.getByTestId('bg-b1')
+    await userEvent.selectOptions(within(card).getByLabelText('Fon'), 'dark')
+    await userEvent.click(within(card).getByRole('button', { name: 'Uslub qilish' }))
+    expect(calls.find((c) => c.key === 'POST /admin/backgrounds/b1/style')?.body).toEqual({
+      name: 'Foto · Oshxona',
+      dark: true,
+      accent: '#E8590C',
+    })
+    // Bepul uslubni o'chirish tugmasi yo'q, Premiumni — bor
+    expect(within(screen.getByTestId('style-olov')).queryByRole('button')).toBeNull()
+    await userEvent.click(
+      within(screen.getByTestId('style-f-loft')).getByRole('button', { name: 'O‘chirish' }),
+    )
+    expect(calls.find((c) => c.key === 'POST /admin/styles/f-loft/active')?.body).toEqual({
+      active: false,
+    })
+  })
 })

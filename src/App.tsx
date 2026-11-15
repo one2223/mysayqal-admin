@@ -2,6 +2,7 @@ import { NavLink, Navigate, Route, Routes } from 'react-router'
 import { Gate } from './Gate'
 import { t, type Key } from './i18n'
 import { Audit } from './pages/Audit'
+import { Backgrounds } from './pages/Backgrounds'
 import { Orders } from './pages/Orders'
 import { Plans } from './pages/Plans'
 import { Promos } from './pages/Promos'
@@ -14,6 +15,7 @@ const NAV: [string, Key][] = [
   ['/foydalanuvchilar', 'nav.users'],
   ['/tariflar', 'nav.plans'],
   ['/promo', 'nav.promos'],
+  ['/fonlar', 'nav.backgrounds'],
   ['/jurnal', 'nav.audit'],
 ]
 
@@ -46,6 +48,7 @@ export default function App() {
               <Route path="foydalanuvchilar" element={<Users />} />
               <Route path="tariflar" element={<Plans />} />
               <Route path="promo" element={<Promos />} />
+              <Route path="fonlar" element={<Backgrounds />} />
               <Route path="jurnal" element={<Audit />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
