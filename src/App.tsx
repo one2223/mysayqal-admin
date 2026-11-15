@@ -27,8 +27,14 @@ export default function App() {
           <header className="top">
             <div className="container top-row">
               <strong className="logo">
-                mysayqal<span>.</span> admin
+                <span className="logo-word">
+                  <span className="logo-my">my</span>sayqal
+                </span>
+                <svg className="logo-swoosh" viewBox="0 0 200 20" aria-hidden="true">
+                  <path d="M4 14C60 4 140 2 196 8" />
+                </svg>
               </strong>
+              <span className="logo-admin">admin</span>
               <nav className="nav">
                 {NAV.map(([to, key]) => (
                   <NavLink key={to} to={to} end={to === '/'}>

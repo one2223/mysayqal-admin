@@ -83,8 +83,31 @@ code {
   font-size: 20px;
   font-weight: 800;
 }
-.logo span {
-  color: var(--accent);
+/* Logotip E (egasi tanladi, 2026-11-15): "my" yengil, "sayqal" qalin, ostida jilo chizig'i */
+.logo {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1;
+}
+.logo-word {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.logo-my {
+  font-weight: 600;
+  color: var(--ink-2, #6b7280);
+}
+.logo-swoosh {
+  width: 4.6em;
+  height: 0.45em;
+  margin-top: 1px;
+}
+.logo-swoosh path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 7;
+  stroke-linecap: round;
 }
 .nav {
   display: flex;
@@ -332,4 +355,10 @@ textarea.input {
 }
 .cards > .form-grid {
   align-content: start;
+}
+.logo-admin {
+  font-weight: 700;
+  color: var(--ink-2);
+  font-size: 14px;
+  margin-left: -8px;
 }
