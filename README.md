@@ -19,4 +19,4 @@ npm run typecheck && npm run lint && npm test && npm run build && npm run format
 ## Chiqarish
 
 `git push origin main:production` → GitHub Actions `Deploy admin` → serverda `/srv/mysayqal/admin/current`.
-Repo sozlamalari (mysayqal-frontend dagidek): variables `WEB_SERVER_USER`, `WEB_SERVER_IP`, `WEB_SERVER_PORT`, `WEB_SERVER_HOST_FP`; secret `DEPLOY_KEY`.
+Server manzili workflow ichida (sir emas). Repo'da faqat secret kerak: `DEPLOY_KEY` (mysayqal-frontend dagi bilan bir xil).

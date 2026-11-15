@@ -3,7 +3,7 @@
 # serverga faqat tayyor `dist/` boradi — nginx fayllarni o'zi beradi.
 #
 # Serverda: /srv/mysayqal/admin/releases/<vaqt> → `current` havolasi bir zumda almashadi, oxirgi 5 versiya qoladi.
-# Server qiymatlari — shu repo variables (WEB_SERVER_*, mysayqal-frontend dagidek), kalit — secrets (DEPLOY_KEY). Qo'llanma: mysayqal-backend deploy/README.md.
+# Server qiymatlari — quyida (sir emas); kalit — secret DEPLOY_KEY (mysayqal-frontend dagi bilan bir xil). Qo'llanma: mysayqal-backend deploy/README.md.
 # Chiqarish: `git push origin main:production`.
 name: Deploy admin
 
@@ -17,11 +17,12 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  SERVER_USER: ${{ vars.WEB_SERVER_USER }}
-  SERVER_IP: ${{ vars.WEB_SERVER_IP }}
-  SERVER_PORT: ${{ vars.WEB_SERVER_PORT }}
+  # Sir emas (mysayqal-backend deploy.yml dagidek) — repo variables shart emas
+  SERVER_USER: deploy-mysayqal
+  SERVER_IP: '45.138.159.141'
+  SERVER_PORT: '2222'
   # Serverning SSH host kaliti (sir emas) — boshqa server bilan almashtirib qo'yishdan himoya
-  SERVER_HOST_FP: ${{ vars.WEB_SERVER_HOST_FP }}
+  SERVER_HOST_FP: 'SHA256:9LiZG9EIDqd7Hv6vXSZ/cg04Jnrkjhozupzg0XzBtxI'
   DIR: /srv/mysayqal/admin
 
 jobs:
@@ -32,7 +33,7 @@ jobs:
       - name: Sozlamalar bormi
         run: |
           for v in SERVER_USER SERVER_IP SERVER_PORT SERVER_HOST_FP; do
-            if [ -z "${!v}" ]; then echo "::error::Repo variable yo'q: WEB_${v}"; exit 1; fi
+            if [ -z "${!v}" ]; then echo "::error::Sozlama yo'q: ${v}"; exit 1; fi
           done
 
       - uses: actions/checkout@v4
