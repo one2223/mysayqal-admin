@@ -33,6 +33,8 @@ const uz = {
   'stats.exports': 'Kartochkalar (7 kun)',
   'stats.ai': 'AI xarajati (oy)',
   'stats.aiToday': 'bugun {n} so‘rov',
+  'stats.aiNote':
+    'Faqat mysayqal serveridagi so‘rovlar (token × narx). Claude Console’dagi kalit xarajatiga sinovlar ham qo‘shiladi.',
   'orders.open': 'Ochiqlari',
   'orders.all': 'Hammasi',
   'orders.code': 'Kod',

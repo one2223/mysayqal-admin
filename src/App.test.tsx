@@ -73,7 +73,7 @@ describe('admin panel', () => {
     })
     open()
     expect(await screen.findByText('276 000 so‘m')).toBeInTheDocument()
-    expect(screen.getByText('$0.42 / $5')).toBeInTheDocument()
+    expect(screen.getByText('$0.420 / $5')).toBeInTheDocument()
     expect(screen.getByText('bugun +3, hafta +10')).toBeInTheDocument()
   })
 

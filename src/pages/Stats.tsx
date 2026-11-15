@@ -34,16 +34,22 @@ export function Stats() {
         <Tile label={t('stats.exports')} value={data.exportsWeek} />
         <Tile
           label={t('stats.ai')}
-          value={`$${data.aiSpentMonthUsd.toFixed(2)} / $${data.aiBudgetUsd.toFixed(0)}`}
+          value={`$${usd(data.aiSpentMonthUsd)} / $${data.aiBudgetUsd.toFixed(0)}`}
           sub={t('stats.aiToday', { n: data.aiRequestsToday })}
         >
           <div className="meter" aria-hidden="true">
             <span style={{ width: `${aiShare}%` }} />
           </div>
+          <span className="muted small">{t('stats.aiNote')}</span>
         </Tile>
       </div>
     </section>
   )
+}
+
+/** Kichik summa ham ko'rinsin: 0.012 (0 ga yaxlitlanib ketmasin). */
+function usd(v: number): string {
+  return v < 1 ? v.toFixed(3) : v.toFixed(2)
 }
 
 function Tile(props: {
