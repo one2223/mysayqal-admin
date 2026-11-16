@@ -12,6 +12,22 @@ export type Stats = {
   aiSpentMonthUsd: number
   aiBudgetUsd: number
   aiRequestsToday: number
+  /** Oxirgi 7 kunda kamida bitta kartochka yuklaganlar. */
+  activeWeek: number
+  /** Bepul 3 tasini ishlatib bo'lgan, Premium'siz. */
+  freeExhausted: number
+}
+
+/** Kunlik dinamika (Toshkent kuni). */
+export type DayStat = {
+  day: string
+  users: number
+  phones: number
+  exports: number
+  exportUsers: number
+  ai: number
+  paid: number
+  revenueUzs: number
 }
 
 export type OrderStatus = 'PENDING' | 'RECEIPT' | 'PAID' | 'REJECTED' | 'EXPIRED'

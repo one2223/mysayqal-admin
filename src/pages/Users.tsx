@@ -1,17 +1,29 @@
 import { useState } from 'react'
+import { useSearchParams } from 'react-router'
 import { t } from '../i18n'
 import { api } from '../lib/api'
 import { formatDate } from '../lib/date'
 import type { User } from '../lib/types'
 import { errText, useLoad } from '../lib/useLoad'
 
+type Filter = 'all' | 'limit' | 'premium'
+const FILTERS: Filter[] = ['all', 'limit', 'premium']
+
 export function Users() {
   const [input, setInput] = useState('')
   const [q, setQ] = useState('')
-  const { data, error, reload } = useLoad(
-    () => api<User[]>(`/admin/users${q ? `?q=${encodeURIComponent(q)}` : ''}`),
-    [q],
-  )
+  // Filtr manzilda: statistikadagi "Bepul limiti tugagan" shu yerga olib keladi
+  const [params, setParams] = useSearchParams()
+  const filter = FILTERS.includes(params.get('filter') as Filter)
+    ? (params.get('filter') as Filter)
+    : 'all'
+  const { data, error, reload } = useLoad(() => {
+    const p = new URLSearchParams()
+    if (q) p.set('q', q)
+    if (filter !== 'all') p.set('filter', filter)
+    const s = p.toString()
+    return api<User[]>(`/admin/users${s ? `?${s}` : ''}`)
+  }, [q, filter])
   const [msg, setMsg] = useState('')
 
   async function act(fn: () => Promise<unknown>, done: string) {
@@ -69,6 +81,18 @@ export function Users() {
           🔍
         </button>
       </form>
+      <div className="seg" role="group" aria-label={t('nav.users')}>
+        {FILTERS.map((f) => (
+          <button
+            key={f}
+            type="button"
+            aria-pressed={filter === f}
+            onClick={() => setParams(f === 'all' ? {} : { filter: f })}
+          >
+            {t(`users.filter.${f}`)}
+          </button>
+        ))}
+      </div>
       {msg && (
         <p className="note" role="status">
           {msg}
@@ -101,7 +125,16 @@ export function Users() {
                     <div className="muted small">{formatDate(u.createdAt)}</div>
                   </td>
                   <td>
-                    {u.username ? `@${u.username}` : u.tgId ? `tg ${u.tgId}` : '—'}
+                    {/* Username bo'lsa — Telegram'da yozish uchun havola */}
+                    {u.username ? (
+                      <a href={`https://t.me/${u.username}`} target="_blank" rel="noreferrer">
+                        @{u.username}
+                      </a>
+                    ) : u.tgId ? (
+                      `tg ${u.tgId}`
+                    ) : (
+                      '—'
+                    )}
                     <div className="muted small">{u.phone ?? ''}</div>
                   </td>
                   <td>

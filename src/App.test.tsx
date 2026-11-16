@@ -69,10 +69,40 @@ describe('admin panel', () => {
         aiSpentMonthUsd: 0.42,
         aiBudgetUsd: 5,
         aiRequestsToday: 7,
+        activeWeek: 6,
+        freeExhausted: 4,
       }),
+      'GET /admin/stats/daily?days=14': () => [
+        {
+          day: '2026-11-15',
+          users: 2,
+          phones: 1,
+          exports: 3,
+          exportUsers: 1,
+          ai: 0,
+          paid: 0,
+          revenueUzs: 0,
+        },
+        {
+          day: '2026-11-16',
+          users: 5,
+          phones: 4,
+          exports: 9,
+          exportUsers: 3,
+          ai: 2,
+          paid: 1,
+          revenueUzs: 49000,
+        },
+      ],
     })
     open()
     expect(await screen.findByText('276 000 so‘m')).toBeInTheDocument()
+    expect(
+      screen.getByRole('link', { name: 'Premium olmagan — roʻyxatni ochish' }),
+    ).toHaveAttribute('href', '/foydalanuvchilar?filter=limit')
+    const rows = within(await screen.findByTestId('daily')).getAllByRole('row')
+    expect(rows[1]).toHaveTextContent('16.11') // eng yangi kun tepada
+    expect(rows[1]).toHaveTextContent('49 000')
     expect(screen.getByText('$0.420 / $5')).toBeInTheDocument()
     expect(screen.getByText('bugun +3, hafta +10')).toBeInTheDocument()
   })
@@ -142,6 +172,26 @@ describe('admin panel', () => {
     expect(row).toHaveTextContent('3/3')
     await userEvent.click(within(row).getByRole('button', { name: '+ Premium' }))
     expect(calls.find((c) => c.key === 'POST /admin/users/u1/premium')?.body).toEqual({ days: 30 })
+    expect(within(row).getByRole('link', { name: '@vali' })).toHaveAttribute(
+      'href',
+      'https://t.me/vali',
+    )
+  })
+
+  it('foydalanuvchilar: "Bepul limiti tugagan" filtri', async () => {
+    const calls = server({
+      ...me,
+      'GET /admin/users?filter=limit': () => [],
+      'GET /admin/users': () => [],
+    })
+    open('/foydalanuvchilar?filter=limit')
+    expect(
+      await screen.findByRole('button', { name: 'Bepul limiti tugagan', pressed: true }),
+    ).toBeInTheDocument()
+    await screen.findByText(/./, { selector: '.muted' })
+    expect(calls.some((c) => c.key === 'GET /admin/users?filter=limit')).toBe(true)
+    await userEvent.click(screen.getByRole('button', { name: 'Hammasi' }))
+    expect(calls.some((c) => c.key === 'GET /admin/users')).toBe(true)
   })
 
   it('tarif narxini oʻzgartirish', async () => {

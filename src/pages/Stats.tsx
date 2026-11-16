@@ -1,10 +1,12 @@
+import { Link } from 'react-router'
 import { money, t } from '../i18n'
 import { api } from '../lib/api'
-import type { Stats as S } from '../lib/types'
+import type { DayStat, Stats as S } from '../lib/types'
 import { useLoad } from '../lib/useLoad'
 
 export function Stats() {
   const { data, error } = useLoad(() => api<S>('/admin/stats'))
+  const daily = useLoad(() => api<DayStat[]>('/admin/stats/daily?days=14'))
   if (error) return <p className="error">{t('common.error', { msg: error })}</p>
   if (!data) return <p className="muted">…</p>
   const aiShare =
@@ -32,6 +34,16 @@ export function Stats() {
           sub={t('stats.paid', { n: data.paid30d })}
         />
         <Tile label={t('stats.exports')} value={data.exportsWeek} />
+        <Tile label={t('stats.active')} value={data.activeWeek} sub={t('stats.activeSub')} />
+        <Tile
+          label={t('stats.exhausted')}
+          value={data.freeExhausted}
+          accent={data.freeExhausted > 0}
+        >
+          <Link className="small" to="/foydalanuvchilar?filter=limit">
+            {t('stats.exhaustedSub')}
+          </Link>
+        </Tile>
         <Tile
           label={t('stats.ai')}
           value={`$${usd(data.aiSpentMonthUsd)} / $${data.aiBudgetUsd.toFixed(0)}`}
@@ -43,7 +55,48 @@ export function Stats() {
           <span className="muted small">{t('stats.aiNote')}</span>
         </Tile>
       </div>
+      {daily.data && <Daily rows={daily.data} />}
     </section>
+  )
+}
+
+/** Kunlik jadval: eng yangi kun tepada. */
+function Daily({ rows }: { rows: DayStat[] }) {
+  const list = [...rows].reverse()
+  return (
+    <>
+      <h2>{t('stats.daily')}</h2>
+      <div className="table-wrap">
+        <table data-testid="daily">
+          <thead>
+            <tr>
+              <th>{t('stats.day')}</th>
+              <th className="num">{t('stats.dUsers')}</th>
+              <th className="num">{t('stats.dPhones')}</th>
+              <th className="num">{t('stats.dExports')}</th>
+              <th className="num">{t('stats.dExportUsers')}</th>
+              <th className="num">{t('stats.dAi')}</th>
+              <th className="num">{t('stats.dPaid')}</th>
+              <th className="num">{t('stats.dRevenue')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {list.map((d) => (
+              <tr key={d.day}>
+                <td>{d.day.slice(5).split('-').reverse().join('.')}</td>
+                <td className="num">{d.users}</td>
+                <td className="num">{d.phones}</td>
+                <td className="num">{d.exports}</td>
+                <td className="num">{d.exportUsers}</td>
+                <td className="num">{d.ai}</td>
+                <td className="num">{d.paid}</td>
+                <td className="num">{d.revenueUzs ? money(d.revenueUzs) : '—'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   )
 }
 
