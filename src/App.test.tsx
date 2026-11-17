@@ -119,7 +119,10 @@ describe('admin panel', () => {
     expect(src[1]).toHaveTextContent('zoom')
     expect(src[1]).toHaveTextContent('40')
     await userEvent.type(screen.getByRole('textbox', { name: /Manba nomi/ }), 'Club')
-    expect(screen.getByTestId('src-link')).toHaveTextContent('https://mysayqal.uz/?src=club')
+    expect(screen.getByTestId('src-link-site')).toHaveTextContent('https://mysayqal.uz/?src=club')
+    expect(screen.getByTestId('src-link-bot')).toHaveTextContent(
+      'https://t.me/mysayqal_bot?start=src_club',
+    )
     expect(screen.getByText('$0.420 / $5')).toBeInTheDocument()
     expect(screen.getByText('bugun +3, hafta +10')).toBeInTheDocument()
   })

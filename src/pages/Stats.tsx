@@ -128,14 +128,18 @@ function Tile(props: {
 /** Reklama havolasi yasagich va manbalar jadvali. */
 function Sources({ rows }: { rows: SourceStat[] }) {
   const [name, setName] = useState('')
-  const [copied, setCopied] = useState(false)
+  const [copied, setCopied] = useState<string | null>(null)
   const clean = name.trim().toLowerCase()
   const valid = /^[a-z0-9_-]{1,32}$/.test(clean)
-  const link = `https://mysayqal.uz/?src=${clean}`
-  async function copy() {
+  // Sayt havolasi va bot havolasi (bot "Ochish" tugmasi bilan Mini App'ni shu manba bilan ochadi)
+  const links = [
+    { key: 'site', label: t('src.site'), url: `https://mysayqal.uz/?src=${clean}` },
+    { key: 'bot', label: t('src.bot'), url: `https://t.me/mysayqal_bot?start=src_${clean}` },
+  ]
+  async function copy(key: string, url: string) {
     try {
-      await navigator.clipboard.writeText(link)
-      setCopied(true)
+      await navigator.clipboard.writeText(url)
+      setCopied(key)
     } catch {
       // nusxa olinmasa — havola ekranda turibdi
     }
@@ -152,18 +156,20 @@ function Sources({ rows }: { rows: SourceStat[] }) {
           aria-label={t('src.name')}
           onChange={(e) => {
             setName(e.target.value)
-            setCopied(false)
+            setCopied(null)
           }}
         />
-        {valid && (
-          <>
-            <code data-testid="src-link">{link}</code>
-            <button type="button" className="btn secondary" onClick={() => void copy()}>
-              {copied ? t('src.copied') : t('src.copy')}
-            </button>
-          </>
-        )}
       </div>
+      {valid &&
+        links.map((l) => (
+          <div key={l.key} className="row src-maker">
+            <span className="muted small src-label">{l.label}</span>
+            <code data-testid={`src-link-${l.key}`}>{l.url}</code>
+            <button type="button" className="btn secondary" onClick={() => void copy(l.key, l.url)}>
+              {copied === l.key ? t('src.copied') : t('src.copy')}
+            </button>
+          </div>
+        ))}
       {rows.length === 0 ? (
         <p className="muted">{t('src.empty')}</p>
       ) : (

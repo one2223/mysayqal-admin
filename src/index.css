@@ -374,3 +374,7 @@ textarea.input {
 .src-maker code {
   word-break: break-all;
 }
+
+.src-label {
+  min-width: 150px;
+}

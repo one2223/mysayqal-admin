@@ -68,6 +68,8 @@ const uz = {
     'Har reklamaga alohida havola bering — shu yerda qaysi biri qancha odam olib kelgani koʻrinadi.',
   'src.name': 'Manba nomi (masalan: zoom, club, prime)',
   'src.copy': 'Nusxa olish',
+  'src.site': 'Sayt:',
+  'src.bot': 'Bot (Telegram ichida):',
   'src.copied': 'Nusxa olindi',
   'src.source': 'Manba',
   'src.visits': 'Tashrif',
