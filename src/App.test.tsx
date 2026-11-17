@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import App from './App'
@@ -72,6 +72,17 @@ describe('admin panel', () => {
         activeWeek: 6,
         freeExhausted: 4,
       }),
+      'GET /admin/sources?days=30': () => [
+        {
+          source: 'zoom',
+          visits: 40,
+          users: 9,
+          phones: 7,
+          exportUsers: 5,
+          paidUsers: 1,
+          revenueUzs: 49000,
+        },
+      ],
       'GET /admin/stats/daily?days=14': () => [
         {
           day: '2026-11-15',
@@ -103,6 +114,12 @@ describe('admin panel', () => {
     const rows = within(await screen.findByTestId('daily')).getAllByRole('row')
     expect(rows[1]).toHaveTextContent('16.11') // eng yangi kun tepada
     expect(rows[1]).toHaveTextContent('49 000')
+    // Reklama manbalari va havola yasagich
+    const src = within(screen.getByTestId('sources')).getAllByRole('row')
+    expect(src[1]).toHaveTextContent('zoom')
+    expect(src[1]).toHaveTextContent('40')
+    await userEvent.type(screen.getByRole('textbox', { name: /Manba nomi/ }), 'Club')
+    expect(screen.getByTestId('src-link')).toHaveTextContent('https://mysayqal.uz/?src=club')
     expect(screen.getByText('$0.420 / $5')).toBeInTheDocument()
     expect(screen.getByText('bugun +3, hafta +10')).toBeInTheDocument()
   })
@@ -188,10 +205,11 @@ describe('admin panel', () => {
     expect(
       await screen.findByRole('button', { name: 'Bepul limiti tugagan', pressed: true }),
     ).toBeInTheDocument()
-    await screen.findByText(/./, { selector: '.muted' })
-    expect(calls.some((c) => c.key === 'GET /admin/users?filter=limit')).toBe(true)
+    await waitFor(() =>
+      expect(calls.some((c) => c.key === 'GET /admin/users?filter=limit')).toBe(true),
+    )
     await userEvent.click(screen.getByRole('button', { name: 'Hammasi' }))
-    expect(calls.some((c) => c.key === 'GET /admin/users')).toBe(true)
+    await waitFor(() => expect(calls.some((c) => c.key === 'GET /admin/users')).toBe(true))
   })
 
   it('tarif narxini oʻzgartirish', async () => {

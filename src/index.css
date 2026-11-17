@@ -362,3 +362,15 @@ textarea.input {
   font-size: 14px;
   margin-left: -8px;
 }
+
+.src-maker {
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.src-maker .input {
+  flex: 1 1 260px;
+}
+.src-maker code {
+  word-break: break-all;
+}

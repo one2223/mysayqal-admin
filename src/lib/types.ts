@@ -18,6 +18,17 @@ export type Stats = {
   freeExhausted: number
 }
 
+/** Reklama manbasi bo'yicha (?src=). */
+export type SourceStat = {
+  source: string
+  visits: number
+  users: number
+  phones: number
+  exportUsers: number
+  paidUsers: number
+  revenueUzs: number
+}
+
 /** Kunlik dinamika (Toshkent kuni). */
 export type DayStat = {
   day: string

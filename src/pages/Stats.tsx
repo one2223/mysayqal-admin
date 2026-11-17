@@ -1,12 +1,14 @@
+import { useState } from 'react'
 import { Link } from 'react-router'
 import { money, t } from '../i18n'
 import { api } from '../lib/api'
-import type { DayStat, Stats as S } from '../lib/types'
+import type { DayStat, SourceStat, Stats as S } from '../lib/types'
 import { useLoad } from '../lib/useLoad'
 
 export function Stats() {
   const { data, error } = useLoad(() => api<S>('/admin/stats'))
   const daily = useLoad(() => api<DayStat[]>('/admin/stats/daily?days=14'))
+  const sources = useLoad(() => api<SourceStat[]>('/admin/sources?days=30'))
   if (error) return <p className="error">{t('common.error', { msg: error })}</p>
   if (!data) return <p className="muted">…</p>
   const aiShare =
@@ -55,6 +57,7 @@ export function Stats() {
           <span className="muted small">{t('stats.aiNote')}</span>
         </Tile>
       </div>
+      <Sources rows={sources.data ?? []} />
       {daily.data && <Daily rows={daily.data} />}
     </section>
   )
@@ -119,5 +122,80 @@ function Tile(props: {
       {props.sub && <span className="muted small">{props.sub}</span>}
       {props.children}
     </div>
+  )
+}
+
+/** Reklama havolasi yasagich va manbalar jadvali. */
+function Sources({ rows }: { rows: SourceStat[] }) {
+  const [name, setName] = useState('')
+  const [copied, setCopied] = useState(false)
+  const clean = name.trim().toLowerCase()
+  const valid = /^[a-z0-9_-]{1,32}$/.test(clean)
+  const link = `https://mysayqal.uz/?src=${clean}`
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(link)
+      setCopied(true)
+    } catch {
+      // nusxa olinmasa — havola ekranda turibdi
+    }
+  }
+  return (
+    <>
+      <h2>{t('src.title')}</h2>
+      <p className="muted small">{t('src.hint')}</p>
+      <div className="row src-maker">
+        <input
+          className="input"
+          value={name}
+          placeholder={t('src.name')}
+          aria-label={t('src.name')}
+          onChange={(e) => {
+            setName(e.target.value)
+            setCopied(false)
+          }}
+        />
+        {valid && (
+          <>
+            <code data-testid="src-link">{link}</code>
+            <button type="button" className="btn secondary" onClick={() => void copy()}>
+              {copied ? t('src.copied') : t('src.copy')}
+            </button>
+          </>
+        )}
+      </div>
+      {rows.length === 0 ? (
+        <p className="muted">{t('src.empty')}</p>
+      ) : (
+        <div className="table-wrap">
+          <table data-testid="sources">
+            <thead>
+              <tr>
+                <th>{t('src.source')}</th>
+                <th className="num">{t('src.visits')}</th>
+                <th className="num">{t('src.users')}</th>
+                <th className="num">{t('src.phones')}</th>
+                <th className="num">{t('src.exports')}</th>
+                <th className="num">{t('src.paid')}</th>
+                <th className="num">{t('src.revenue')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.source}>
+                  <td>{r.source}</td>
+                  <td className="num">{r.visits}</td>
+                  <td className="num">{r.users}</td>
+                  <td className="num">{r.phones}</td>
+                  <td className="num">{r.exportUsers}</td>
+                  <td className="num">{r.paidUsers}</td>
+                  <td className="num">{r.revenueUzs ? money(r.revenueUzs) : '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </>
   )
 }
